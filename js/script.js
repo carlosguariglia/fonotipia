@@ -1,23 +1,28 @@
-// === Estado y datos ===
-let estado = 'inicio';
-let semilla = null;
-let tiempoInicio = 0;
-let pg;
-let audioContext = null;
-let musicaBuffer = null;
-let musicaSource = null;
-let musicaReproduciendose = false;
-let campanaBuffer = null;
-let grabacionBlob = null;
-let grabacionURL = null;
-let audioGrabado = null;
-let colorPrincipal = [0, 243, 255]; // Color cyan por defecto
-let tonoDetectado = 0;
-let particulas = [];
-let cristalizando = false;
-let progresosCristales = 0;
-let mensajeActual = '';
+// === ESTADO Y DATOS GLOBALES ===
+// Variables que controlan el estado de la aplicación y almacenan datos temporales
+let estado = 'inicio'; // Estados: 'inicio', 'grabado', 'dibujando', 'listo', 'mensaje'
+let semilla = null; // Número generado del audio para reproducibilidad en dibujos
+let tiempoInicio = 0; // Marca de tiempo cuando comienza el dibujo
+let pg; // Graphics buffer de p5.js para dibujar fuera de pantalla
+let audioContext = null; // Contexto de audio para Web Audio API
+let musicaBuffer = null; // Buffer para la música de fondo
+let musicaSource = null; // Fuente de reproducción de música
+let musicaReproduciendose = false; // Flag para controlar reproducción
+let campanaBuffer = null; // Buffer para el sonido de campana
+let grabacionBlob = null; // Blob del audio grabado
+let grabacionURL = null; // URL del blob para reproducción
+let audioGrabado = null; // Elemento Audio para preview
+let colorPrincipal = [0, 243, 255]; // Color base (cyan) para dibujos
+let tonoDetectado = 0; // Frecuencia promedio detectada del audio
+let particulas = []; // Array de partículas para animación
+let cristalizando = false; // Flag para efecto de cristalización final
+let progresosCristales = 0; // Progreso del efecto de cristales
+let mensajeActual = ''; // Mensaje revelado al usuario
 
+// === POOL DE MENSAJES INSPIRADORES ===
+// Colección de mensajes motivadores y reflexivos que se revelan al usuario
+// Cada mensaje está diseñado para ser inspirador, positivo y con un toque místico
+// Los mensajes se eligen aleatoriamente pero evitando repeticiones recientes
 const POOL_MENSAJES = [
   "Eso que esperas, sucederá antes de lo pensado.",
   "La semana que viene es ideal para empezar ese proyecto que tenés pensado.",
@@ -144,6 +149,10 @@ const POOL_MENSAJES = [
 let ultimosMensajes = [];
 
 // === AUDIO ===
+// Funciones para manejar la carga y reproducción de archivos de audio
+// Incluye música de fondo y efectos de sonido para mejorar la experiencia
+
+// Carga la música de fondo desde el directorio audio/
 async function cargarMusica() {
   try {
     const response = await fetch('audio/journey.mp3');
@@ -156,6 +165,7 @@ async function cargarMusica() {
   }
 }
 
+// Carga el sonido de campana para efectos
 async function cargarCampana() {
   try {
     const response = await fetch('audio/campana.mp3');
@@ -167,6 +177,7 @@ async function cargarCampana() {
   }
 }
 
+// Reproduce el sonido de campana con volumen reducido
 function reproducirCampana() {
   if (!campanaBuffer) return;
   const source = audioContext.createBufferSource();
@@ -178,6 +189,7 @@ function reproducirCampana() {
   source.start();
 }
 
+// Inicia la reproducción de música de fondo en loop
 function reproducirMusica() {
   if (!musicaBuffer || musicaReproduciendose) return;
   musicaSource = audioContext.createBufferSource();
@@ -197,6 +209,7 @@ function reproducirMusica() {
   };
 }
 
+// Detiene la reproducción de música
 function detenerMusica() {
   if (musicaSource && musicaReproduciendose) {
     musicaSource.stop();
@@ -205,6 +218,7 @@ function detenerMusica() {
   musicaReproduciendose = false;
 }
 
+// Selecciona un mensaje aleatorio del pool, evitando repeticiones recientes
 function elegirMensaje() {
   const disponibles = POOL_MENSAJES.filter(m => !ultimosMensajes.includes(m));
   if (disponibles.length === 0) {
@@ -218,6 +232,10 @@ function elegirMensaje() {
 }
 
 // === VOZ (MEJORADA CON PREVIEW) ===
+// Funciones para grabar, procesar y analizar la voz del usuario
+// La voz se usa para generar una semilla única y determinar el color del dibujo
+
+// Inicia la grabación de voz por 3 segundos
 async function grabarVoz() {
   if (estado !== 'inicio') return;
 
@@ -249,6 +267,7 @@ async function grabarVoz() {
   }
 }
 
+// Procesa la grabación de audio para extraer características y generar el dibujo
 async function procesarGrabacion() {
   if (!grabacionBlob) return;
   
@@ -281,8 +300,8 @@ async function procesarGrabacion() {
 }
 
 // Detectar tono dominante (frecuencia promedio)
+// Método simplificado: contar cruces por cero para estimar frecuencia
 function detectarTono(audioData, sampleRate) {
-  // Método simplificado: contar cruces por cero para estimar frecuencia
   let cruces = 0;
   for (let i = 1; i < audioData.length; i++) {
     if ((audioData[i-1] >= 0 && audioData[i] < 0) || 
@@ -295,6 +314,7 @@ function detectarTono(audioData, sampleRate) {
 }
 
 // Convertir frecuencia a color (escala cromática)
+// Mapea el tono de voz a un color en la rueda de colores HSL
 function tonoAColor(frecuencia) {
   // Rango típico voz humana: 85Hz (bajo) a 255Hz (alto)
   // Mapear a escala de color: rojo(0) -> naranja -> amarillo -> verde -> cyan -> azul -> violeta(300)
@@ -327,7 +347,7 @@ function tonoAColor(frecuencia) {
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
-// Función auxiliar map con constrain
+// Función auxiliar map con constrain (similar a p5.js map)
 function map(value, start1, stop1, start2, stop2, withinBounds) {
   const mapped = start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
   if (!withinBounds) return mapped;
@@ -337,6 +357,10 @@ function map(value, start1, stop1, start2, stop2, withinBounds) {
 }
 
 // === P5 ===
+// Funciones de p5.js para generar arte generativo basado en la voz
+// El dibujo se crea en etapas progresivas durante 12 segundos
+
+// Configuración inicial del canvas y elementos gráficos
 function setup() {
   const size = Math.min(windowWidth * 0.9, windowHeight * 0.6, 600);
   pg = createGraphics(size, size);
@@ -349,12 +373,13 @@ function setup() {
   }
 }
 
-// Clase Partícula
+// Clase Partícula para efectos visuales durante el dibujo
 class Particula {
   constructor() {
     this.reiniciar();
   }
   
+  // Reinicia la partícula con posición y velocidad aleatorias
   reiniciar() {
     const angulo = random(TWO_PI);
     const radio = width / 2 + random(10, 30);
@@ -367,6 +392,7 @@ class Particula {
     this.vida = 255;
   }
   
+  // Actualiza posición y vida de la partícula
   actualizar() {
     this.x += this.vx;
     this.y += this.vy;
@@ -377,6 +403,7 @@ class Particula {
     }
   }
   
+  // Dibuja la partícula en el canvas
   mostrar() {
     push();
     noStroke();
@@ -386,6 +413,7 @@ class Particula {
   }
 }
 
+// Función principal de dibujo que se ejecuta en cada frame
 function draw() {
   if (estado !== 'dibujando' && estado !== 'listo' && estado !== 'mensaje') {
     clear();
@@ -403,7 +431,7 @@ function draw() {
     pg.randomSeed(semilla);
   }
 
-  // Etapa 1: Círculos (0–3s)
+  // Etapa 1: Círculos (0–3s) - Dibuja círculos de diferentes tamaños
   if (estado === 'dibujando' && t > 0) {
     const progreso = Math.min(t / 3000, 1);
     const total = 35;
@@ -419,7 +447,7 @@ function draw() {
     }
   }
 
-  // Etapa 2: Líneas (3–6s)
+  // Etapa 2: Líneas (3–6s) - Agrega líneas conectando puntos aleatorios
   if (estado === 'dibujando' && t > 3000) {
     const tiempoEtapa = t - 3000;
     const progreso = Math.min(tiempoEtapa / 3000, 1);
@@ -437,7 +465,7 @@ function draw() {
     }
   }
 
-  // Etapa 3: Espirales (6–9s)
+  // Etapa 3: Espirales (6–9s) - Crea espirales usando curvas
   if (estado === 'dibujando' && t > 6000) {
     const tiempoEtapa = t - 6000;
     const progreso = Math.min(tiempoEtapa / 3000, 1);
@@ -460,7 +488,7 @@ function draw() {
     }
   }
 
-  // Etapa 4: Curvas Bézier (9–12s)
+  // Etapa 4: Curvas Bézier (9–12s) - Agrega curvas complejas
   if (estado === 'dibujando' && t > 9000) {
     const tiempoEtapa = t - 9000;
     const progreso = Math.min(tiempoEtapa / 3000, 1);
@@ -550,6 +578,7 @@ function draw() {
   }
 }
 
+// Ajusta el tamaño del canvas cuando cambia el tamaño de la ventana
 function windowResized() {
   const size = Math.min(windowWidth * 0.9, windowHeight * 0.6, 600);
   resizeCanvas(size, size);
@@ -557,6 +586,9 @@ function windowResized() {
 }
 
 // === INTERACCIÓN ===
+// Event listeners para botones y controles de la interfaz
+
+// Inicia la aplicación y carga recursos de audio
 document.getElementById('btn-comenzar').onclick = async () => {
   // Crear AudioContext e iniciar música con la primera interacción
   if (!audioContext) {
@@ -573,14 +605,17 @@ document.getElementById('btn-comenzar').onclick = async () => {
   estado = 'inicio';
 };
 
+// Muestra el modal con la historia del proyecto
 document.getElementById('btn-historia').onclick = () => {
   document.getElementById('historia-modal').classList.add('active');
 };
 
+// Oculta el modal de historia
 document.getElementById('btn-cerrar-historia').onclick = () => {
   document.getElementById('historia-modal').classList.remove('active');
 };
 
+// Revela el mensaje inspirador y cambia el estado
 document.getElementById('btn-mensaje').onclick = () => {
   if (estado !== 'listo') return;
   reproducirCampana();
@@ -594,19 +629,23 @@ document.getElementById('btn-mensaje').onclick = () => {
   reproducirMusica();
 };
 
+// Muestra la carta generada en un modal
 document.getElementById('btn-ver-carta').onclick = () => {
   generarCarta();
   document.getElementById('carta-modal').classList.add('active');
 };
 
+// Oculta el modal de la carta
 document.getElementById('btn-cerrar-carta').onclick = () => {
   document.getElementById('carta-modal').classList.remove('active');
 };
 
+// Descarga la carta como imagen PNG
 document.getElementById('btn-descargar-carta').onclick = () => {
   descargarCarta();
 };
 
+// Genera la vista previa de la carta en el modal
 function generarCarta() {
   // Copiar el canvas principal a la carta
   const cartaCanvas = document.getElementById('carta-imagen');
@@ -648,6 +687,7 @@ function generarCarta() {
   document.getElementById('carta-fecha').textContent = `${fecha} • ${hora}`;
 }
 
+// Crea y descarga la carta completa como imagen PNG
 function descargarCarta() {
   // Crear canvas temporal más grande para la carta completa
   const tempCanvas = document.createElement('canvas');
@@ -757,6 +797,7 @@ function descargarCarta() {
   });
 }
 
+// Vuelve a la pantalla de inicio y resetea el estado
 document.getElementById('btn-volver').onclick = () => {
   // Volver a la pantalla de intro
   document.getElementById('main').style.display = 'none';
@@ -804,4 +845,142 @@ document.getElementById('btn-regrabar').onclick = () => {
   document.getElementById('start').style.display = 'inline-block';
   document.getElementById('start').textContent = "Di tu nombre en voz alta";
   estado = 'inicio';
+};
+
+// === ENVIAR POR EMAIL ===
+// Función para compartir la carta por email usando imgbb para hosting de imágenes
+
+// Sube la imagen a imgbb y obtiene la URL pública
+async function subirImagenAImgbb(blob) {
+  const formData = new FormData();
+  formData.append('image', blob);
+  formData.append('key', '246ea11e41f960e348520c7414ea225d'); // Tu API key de imgbb
+  
+  try {
+    const response = await fetch('https://api.imgbb.com/1/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) throw new Error('Error al subir imagen');
+    
+    const data = await response.json();
+    return data.data.url; // URL de la imagen subida
+  } catch (error) {
+    console.error('Error subiendo a imgbb:', error);
+    alert('Error al compartir la imagen. Intenta descargar y enviar manualmente.');
+    return null;
+  }
+}
+
+// Maneja el envío por email: genera la carta, la sube y abre el cliente de email
+document.getElementById('btn-enviar-email').onclick = async () => {
+  // Generar el blob de la carta (igual que en descargarCarta)
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = 400;
+  tempCanvas.height = 600;
+  const ctx = tempCanvas.getContext('2d');
+  
+  // Fondo degradado
+  const gradient = ctx.createLinearGradient(0, 0, 400, 600);
+  gradient.addColorStop(0, '#1a1a2e');
+  gradient.addColorStop(1, '#16213e');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 400, 600);
+  
+  // Borde dorado
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(3, 3, 394, 594);
+  
+  // Título
+  ctx.fillStyle = '#d4af37';
+  ctx.font = 'bold 32px Cinzel, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('FONOTIPIA', 200, 60);
+  
+  // Línea debajo del título
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(60, 80);
+  ctx.lineTo(340, 80);
+  ctx.stroke();
+  
+  // Imagen circular
+  const cartaCanvas = document.getElementById('carta-imagen');
+  ctx.drawImage(cartaCanvas, 60, 110);
+  
+  // Mensaje
+  ctx.fillStyle = '#e0e0e0';
+  ctx.font = 'italic 16px Spectral, serif';
+  ctx.textAlign = 'center';
+  const palabras = mensajeActual.split(' ');
+  let linea = '';
+  let y = 440;
+  const maxWidth = 320;
+  
+  for (let palabra of palabras) {
+    const testLinea = linea + palabra + ' ';
+    const metrics = ctx.measureText(testLinea);
+    if (metrics.width > maxWidth && linea !== '') {
+      ctx.fillText(linea, 200, y);
+      linea = palabra + ' ';
+      y += 24;
+    } else {
+      linea = testLinea;
+    }
+  }
+  ctx.fillText(linea, 200, y);
+  
+  // Fecha
+  const fechaTexto = document.getElementById('carta-fecha').textContent;
+  ctx.fillStyle = '#a0a0a0';
+  ctx.font = '14px Spectral, serif';
+  ctx.fillText(fechaTexto, 200, 560);
+  
+  // Firma del desarrollador
+  ctx.fillStyle = '#707070';
+  ctx.font = 'italic 11px Spectral, serif';
+  ctx.fillText('Carlos Guariglia © 2025', 200, 585);
+  
+  // Ornamentos en las esquinas
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+  ctx.lineWidth = 2;
+  // Superior izquierda
+  ctx.beginPath();
+  ctx.moveTo(20, 60);
+  ctx.lineTo(20, 20);
+  ctx.lineTo(60, 20);
+  ctx.stroke();
+  // Superior derecha
+  ctx.beginPath();
+  ctx.moveTo(340, 20);
+  ctx.lineTo(380, 20);
+  ctx.lineTo(380, 60);
+  ctx.stroke();
+  // Inferior izquierda
+  ctx.beginPath();
+  ctx.moveTo(20, 540);
+  ctx.lineTo(20, 580);
+  ctx.lineTo(60, 580);
+  ctx.stroke();
+  // Inferior derecha
+  ctx.beginPath();
+  ctx.moveTo(340, 580);
+  ctx.lineTo(380, 580);
+  ctx.lineTo(380, 540);
+  ctx.stroke();
+  
+  // Convertir a blob y subir
+  tempCanvas.toBlob(async (blob) => {
+    const imageUrl = await subirImagenAImgbb(blob);
+    if (imageUrl) {
+      // Abrir cliente de email con el enlace
+      const subject = 'Mi carta de Fonotipia';
+      const body = `Hola,\n\nTe comparto mi carta generada con Fonotipia:\n\n${imageUrl}\n\n¡Espero que te guste!\n\nSaludos.`;
+      const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoLink;
+    }
+  });
 };
