@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FONOTIPIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
+</head>
+<body>
+  <div id="intro" class="screen">
+    <h1>FONOTIPIA</h1>
+    <p>
+      Del griego <em>phōnē</em> (φωνή, “voz”) y <em>typos</em> (τύπος, “marca, forma”):<br>
+      <strong>Arte adivinatorio que interpreta las formas generadas por las vibraciones únicas de la voz humana al pronunciar su propio nombre.</strong>
+    </p>
+    <button id="btn-comenzar">Comenzar</button>
+    <button id="btn-historia">Historia</button>
+    <div class="creditos">Idea y desarrollo: Carlos Guariglia © 2025</div>
+  </div>
+
+  <div id="main" class="screen">
+    <h1>FONOTIPIA</h1>
+    <div id="zona-dibujo"></div>
+    <div>
+      <button id="start">Di tu nombre en voz alta</button>
+      <div id="controles-grabacion">
+        <button id="btn-escuchar">Escuchar</button>
+        <button id="btn-usar-grabacion">Usar esta grabación</button>
+        <button id="btn-regrabar">Regrabar</button>
+      </div>
+      <button id="btn-mensaje">Revelar mensaje</button>
+      <button id="btn-ver-carta">Ver Carta</button>
+      <button id="btn-volver">Volver al inicio</button>
+    </div>
+    <div id="mensaje"></div>
+    <div class="creditos">Carlos Guariglia © 2025</div>
+  </div>
+
+  <div id="historia-modal">
+    <div style="max-width:680px; margin:0 auto; text-align:left; font-family:'Cinzel',serif; font-size:1.15rem; line-height:1.7;">
+      <h2>Orígenes de la Fonotipia</h2>
+      <p>
+        En las montañas de Anatolia, alrededor del siglo XI, los derviches de la orden de los Susurrantes descubrieron que al colocar fina arena de mármol sobre una membrana de cuero estirada sobre un tambor de madera de olivo, y pronunciar el verdadero nombre de una persona frente a un cono de bronce conectado al tambor, las vibraciones dibujaban formas efímeras en la arena.
+      </p>
+      <p>
+        Estas figuras —nunca repetidas, incluso para la misma persona— se interpretaban como reflejos del alma en ese instante.
+      </p>
+      <p>
+        Con el tiempo, el arte se perdió... hasta ahora, que la tecnología permite recrear digitalmente las "huellas vocales" con precisión milimétrica.
+      </p>
+      <button id="btn-cerrar-historia">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="carta-modal">
+    <div>
+      <div id="carta-contenedor">
+        <div class="carta-ornamento top-left"></div>
+        <div class="carta-ornamento top-right"></div>
+        <div class="carta-ornamento bottom-left"></div>
+        <div class="carta-ornamento bottom-right"></div>
+        
+        <h2 id="carta-titulo">FONOTIPIA</h2>
+        <canvas id="carta-imagen"></canvas>
+        <div id="carta-mensaje"></div>
+        <div id="carta-fecha"></div>
+        <div id="carta-firma">Carlos Guariglia © 2025</div>
+      </div>
+      
+      <div id="carta-controles">
+        <button id="btn-descargar-carta">Descargar</button>
+        <button id="btn-cerrar-carta">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
