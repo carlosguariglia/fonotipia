@@ -18,6 +18,8 @@ let particulas = []; // Array de partículas para animación
 let cristalizando = false; // Flag para efecto de cristalización final
 let progresosCristales = 0; // Progreso del efecto de cristales
 let mensajeActual = ''; // Mensaje revelado al usuario
+let circulos = []; // Almacena los 4 círculos principales
+let puntos = []; // Almacena puntos adicionales dispersos
 
 // === POOL DE MENSAJES INSPIRADORES ===
 // Colección de mensajes motivadores y reflexivos que se revelan al usuario
@@ -426,86 +428,110 @@ function draw() {
 
   // Solo redibujar el buffer si estamos en estado 'dibujando'
   if (estado === 'dibujando') {
-    pg.background(10, 10, 26, 10);
+    // Aumentar alpha del fondo (de 10 a 25) para que limpie más rápido y se vea más "negro"
+    pg.background(10, 10, 26, 25);
     pg.colorMode(RGB, 255, 255, 255, 255);
-    pg.randomSeed(semilla);
+    // Usar frameCount para variar la semilla en cada frame, pero manteniendo determinismo
+    pg.randomSeed(semilla + frameCount);
   }
 
-  // Etapa 1: Círculos (0–3s) - Dibuja círculos de diferentes tamaños
-  if (estado === 'dibujando' && t > 0) {
-    const progreso = Math.min(t / 3000, 1);
-    const total = 35;
-    const n = Math.floor(total * progreso);
-    for (let i = 0; i < n; i++) {
-      const x = pg.random(pg.width);
-      const y = pg.random(pg.height);
-      const tam = pg.random(8, 45);
-      const alpha = pg.map(i, 0, total, 40, 100);
-      pg.fill(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], alpha);
-      pg.noStroke();
-      pg.ellipse(x, y, tam);
+  // Etapa 1: Onda de Sonido Base (0–4s)
+  // Dibuja la estructura principal que servirá de "esqueleto"
+  if (estado === 'dibujando' && t < 4000) {
+    // Resetear círculos y puntos si estamos empezando
+    if (t < 100) {
+      circulos = [];
+      puntos = [];
     }
-  }
 
-  // Etapa 2: Líneas (3–6s) - Agrega líneas conectando puntos aleatorios
-  if (estado === 'dibujando' && t > 3000) {
-    const tiempoEtapa = t - 3000;
-    const progreso = Math.min(tiempoEtapa / 3000, 1);
-    const total = 20;
-    const n = Math.floor(total * progreso);
-    pg.stroke(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 90);
+    pg.push();
+    pg.translate(pg.width / 2, pg.height / 2);
+    pg.noFill();
+    pg.stroke(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 150);
     pg.strokeWeight(1.5);
-    pg.noFill();
-    for (let i = 0; i < n; i++) {
-      const x1 = pg.random(pg.width);
-      const y1 = pg.random(pg.height);
-      const x2 = x1 + pg.random(-120, 120);
-      const y2 = y1 + pg.random(-120, 120);
-      pg.line(x1, y1, x2, y2);
+
+    pg.beginShape();
+    for (let x = -pg.width / 2; x < pg.width / 2; x += 5) {
+      const n = noise(x * 0.01, t * 0.002, semilla);
+      const amp = map(sin(t * 0.005 + x * 0.05), -1, 1, 40, 120) * n;
+      const y = sin(x * 0.02 + t * 0.01) * amp;
+      pg.vertex(x, y);
+    }
+    pg.endShape();
+    pg.pop();
+  }
+
+  // Etapa 2: Puntos de Fondo (Textura) (2–12s)
+  if (estado === 'dibujando' && t > 2000) {
+    const densidad = 30;
+    pg.noStroke();
+    pg.fill(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 40);
+
+    for (let i = 0; i < densidad; i++) {
+      const r = pg.random(pg.width * 0.45);
+      const ang = pg.random(TWO_PI);
+      const x = pg.width / 2 + cos(ang) * r;
+      const y = pg.height / 2 + sin(ang) * r;
+      const tam = pg.random(1, 2.5);
+      pg.ellipse(x, y, tam, tam);
     }
   }
 
-  // Etapa 3: Espirales (6–9s) - Crea espirales usando curvas
-  if (estado === 'dibujando' && t > 6000) {
-    const tiempoEtapa = t - 6000;
-    const progreso = Math.min(tiempoEtapa / 3000, 1);
-    const total = 3;
-    const n = Math.floor(total * progreso);
-    pg.noFill();
-    pg.stroke(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 120);
-    pg.strokeWeight(2);
-    for (let e = 0; e < n; e++) {
-      const cx = pg.random(120, pg.width - 120);
-      const cy = pg.random(120, pg.height - 120);
-      pg.beginShape();
-      for (let a = 0; a < pg.TWO_PI * 3; a += 0.1) {
-        const r = pg.map(a, 0, pg.TWO_PI * 3, 3, 50);
-        const x = cx + pg.cos(a) * r;
-        const y = cy + pg.sin(a) * r;
-        pg.vertex(x, y);
+  // Etapa 3: 4 Círculos y Curvas (4–12s)
+  if (estado === 'dibujando' && t > 4000) {
+    // Inicializar los 4 círculos si no existen
+    if (circulos.length === 0) {
+      for (let i = 0; i < 4; i++) {
+        circulos.push({
+          x: pg.random(pg.width * 0.2, pg.width * 0.8),
+          y: pg.random(pg.height * 0.2, pg.height * 0.8),
+          tam: pg.random(40, 200), // Tamaños variados
+          alpha: 0
+        });
       }
-      pg.endShape();
+      // Inicializar puntos dispersos (entre 10 y 20)
+      const numPuntos = Math.floor(pg.random(10, 20));
+      for (let i = 0; i < numPuntos; i++) {
+        puntos.push({
+          x: pg.random(pg.width),
+          y: pg.random(pg.height),
+          tam: pg.random(3, 8), // Puntos visibles pero pequeños
+          alpha: 0
+        });
+      }
     }
-  }
 
-  // Etapa 4: Curvas Bézier (9–12s) - Agrega curvas complejas
-  if (estado === 'dibujando' && t > 9000) {
-    const tiempoEtapa = t - 9000;
-    const progreso = Math.min(tiempoEtapa / 3000, 1);
-    const total = 8;
-    const n = Math.floor(total * progreso);
-    pg.noFill();
-    pg.stroke(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 100);
-    pg.strokeWeight(2.5);
-    for (let i = 0; i < n; i++) {
+    // Dibujar los 4 círculos
+    for (let c of circulos) {
+      // Aumentar opacidad gradualmente hasta un límite
+      if (c.alpha < 40) c.alpha += 0.5;
+
+      pg.noStroke();
+      pg.fill(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], c.alpha);
+      pg.ellipse(c.x, c.y, c.tam);
+    }
+
+    // Dibujar los puntos dispersos
+    for (let p of puntos) {
+      if (p.alpha < 150) p.alpha += 2; // Aparecen más rápido y son más opacos
+      pg.noStroke();
+      pg.fill(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], p.alpha);
+      pg.ellipse(p.x, p.y, p.tam);
+    }
+
+    // Curvas Bézier (mantenerlas como pidió el usuario "las curvas estan bien")
+    if (frameCount % 20 === 0) {
+      pg.noFill();
+      pg.stroke(colorPrincipal[0], colorPrincipal[1], colorPrincipal[2], 50);
+      pg.strokeWeight(1);
       const x1 = pg.random(pg.width);
       const y1 = pg.random(pg.height);
       const x2 = pg.random(pg.width);
       const y2 = pg.random(pg.height);
-      const cx1 = (x1 + x2) / 2 + pg.random(-120, 120);
-      const cy1 = (y1 + y2) / 2 + pg.random(-120, 120);
-      const cx2 = cx1 + pg.random(-60, 60);
-      const cy2 = cy1 + pg.random(-60, 60);
+      const cx1 = (x1 + x2) / 2 + pg.random(-100, 100);
+      const cy1 = (y1 + y2) / 2 + pg.random(-100, 100);
+      const cx2 = cx1 + pg.random(-50, 50);
+      const cy2 = cy1 + pg.random(-50, 50);
       pg.bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
     }
   }
