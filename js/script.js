@@ -709,7 +709,9 @@ function generarCarta() {
   ctx.beginPath();
   ctx.arc(140, 140, 140, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(pg.canvas, 0, 0, pg.width, pg.height, 0, 0, 280, 280);
+  // Usar la versión simple de drawImage para que escale todo el canvas fuente al destino
+  // Esto evita problemas de recorte por pixelDensity en móviles
+  ctx.drawImage(pg.canvas, 0, 0, 280, 280);
   ctx.restore();
 
   // Borde del círculo
