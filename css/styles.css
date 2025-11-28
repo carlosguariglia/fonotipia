@@ -5,6 +5,7 @@ body {
   color: white;
   font-family: 'Spectral', serif;
 }
+
 .screen {
   position: absolute;
   top: 0;
@@ -15,12 +16,14 @@ body {
   align-items: center;
   padding: 0;
 }
+
 h1 {
   font-family: 'Cinzel', serif;
   font-size: 4rem;
   margin: 1rem 0 0.5rem;
   text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
 }
+
 button {
   padding: 0.6rem 1.4rem;
   margin: 0.4rem;
@@ -32,24 +35,29 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 button:hover {
   background: rgba(0, 243, 255, 0.4);
   box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
 }
+
 #intro p {
   text-align: center;
   padding: 0 1.5rem;
   font-style: italic;
   max-width: 600px;
   font-size: 1.7rem;
-  
+
 }
+
 #btn-historia {
   font-size: 0.9rem;
 }
+
 #main {
   display: none;
 }
+
 #controles-grabacion {
   display: none;
   margin: 1rem 0;
@@ -57,12 +65,14 @@ button:hover {
   flex-wrap: wrap;
   justify-content: center;
 }
+
 #zona-dibujo {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 #mensaje {
   font-size: 1.6rem;
   margin: 1rem auto;
@@ -72,15 +82,20 @@ button:hover {
   transition: opacity 1.5s;
   margin-bottom: 3rem;
 }
-#btn-mensaje, #btn-ver-carta, #btn-volver {
+
+#btn-mensaje,
+#btn-ver-carta,
+#btn-volver {
   display: none;
 }
+
 #zona-dibujo {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 #mensaje {
   font-size: 1.6rem;
   margin: 1rem auto;
@@ -90,19 +105,24 @@ button:hover {
   transition: opacity 1.5s;
   margin-bottom: 3rem;
 }
+
 #historia-modal {
   display: none;
   position: absolute;
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   z-index: 100;
   padding: 2rem;
   box-sizing: border-box;
   overflow-y: auto;
 }
-#historia-modal.active { display: block; }
+
+#historia-modal.active {
+  display: block;
+}
+
 #carta-modal {
   display: none;
   position: fixed;
@@ -110,7 +130,7 @@ button:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.95);
+  background: rgba(0, 0, 0, 0.95);
   z-index: 200;
   justify-content: center;
   align-items: center;
@@ -118,7 +138,11 @@ button:hover {
   padding: 2rem;
   box-sizing: border-box;
 }
-#carta-modal.active { display: flex; }
+
+#carta-modal.active {
+  display: flex;
+}
+
 #carta-contenedor {
   position: relative;
   width: 400px;
@@ -128,13 +152,14 @@ button:hover {
   border: 3px solid;
   border-image: linear-gradient(45deg, #d4af37, #f4e5a1, #d4af37) 1;
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.5),
-              inset 0 0 20px rgba(212, 175, 55, 0.1);
+    inset 0 0 20px rgba(212, 175, 55, 0.1);
   padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
+
 #carta-titulo {
   font-family: 'Cinzel', serif;
   font-size: 1.8rem;
@@ -147,6 +172,7 @@ button:hover {
   width: 100%;
   text-align: center;
 }
+
 #carta-imagen {
   width: 280px;
   height: 280px;
@@ -155,6 +181,7 @@ button:hover {
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
   background: #0a0a1a;
 }
+
 #carta-mensaje {
   font-family: 'Spectral', serif;
   font-size: 1rem;
@@ -167,12 +194,14 @@ button:hover {
   display: flex;
   align-items: center;
 }
+
 #carta-fecha {
   font-size: 0.85rem;
   color: #a0a0a0;
   font-family: 'Spectral', serif;
   margin-top: auto;
 }
+
 #carta-firma {
   font-size: 0.7rem;
   color: #707070;
@@ -180,6 +209,7 @@ button:hover {
   font-style: italic;
   margin-top: 0.3rem;
 }
+
 .carta-ornamento {
   position: absolute;
   width: 60px;
@@ -187,6 +217,7 @@ button:hover {
   border: 2px solid #d4af37;
   opacity: 0.3;
 }
+
 .carta-ornamento.top-left {
   top: 10px;
   left: 10px;
@@ -194,6 +225,7 @@ button:hover {
   border-bottom: none;
   border-radius: 10px 0 0 0;
 }
+
 .carta-ornamento.top-right {
   top: 10px;
   right: 10px;
@@ -201,6 +233,7 @@ button:hover {
   border-bottom: none;
   border-radius: 0 10px 0 0;
 }
+
 .carta-ornamento.bottom-left {
   bottom: 10px;
   left: 10px;
@@ -208,6 +241,7 @@ button:hover {
   border-top: none;
   border-radius: 0 0 0 10px;
 }
+
 .carta-ornamento.bottom-right {
   bottom: 10px;
   right: 10px;
@@ -215,11 +249,13 @@ button:hover {
   border-top: none;
   border-radius: 0 0 10px 0;
 }
+
 #carta-controles {
   margin-top: 2rem;
   display: flex;
   gap: 1rem;
 }
+
 .creditos {
   position: absolute;
   bottom: 1rem;
@@ -244,7 +280,7 @@ button:hover {
   h1 {
     font-size: 2.5rem;
   }
-  
+
   #intro p {
     font-size: 1.2rem;
     padding: 0 1rem;
@@ -252,36 +288,57 @@ button:hover {
 
   #carta-contenedor {
     width: 90%;
-    max-width: 350px;
+    max-width: 340px;
+    /* Slightly smaller max-width for better fit */
     height: auto;
-    min-height: 500px;
-    padding: 1.5rem;
+    min-height: auto;
+    /* Remove fixed min-height to adapt to content */
+    padding: 1rem;
+    /* Reduce padding */
+    gap: 1rem;
   }
 
   #carta-imagen {
-    width: 200px;
-    height: 200px;
+    width: 60vw;
+    /* Responsive width based on viewport */
+    height: 60vw;
+    max-width: 220px;
+    max-height: 220px;
   }
 
   #carta-titulo {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.3rem;
+  }
+
+  #carta-mensaje {
+    font-size: 0.95rem;
+    padding: 0;
   }
 
   button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    padding: 0.5rem 0.8rem;
+    /* Smaller buttons */
+    font-size: 0.9rem;
     margin: 0.2rem;
   }
-  
+
+  #carta-controles {
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   #controles-grabacion {
     flex-direction: column;
     align-items: center;
   }
 
-  #historia-modal, #carta-modal {
+  #historia-modal,
+  #carta-modal {
     padding: 1rem;
   }
-  
+
   .historia-content {
     font-size: 1rem;
   }

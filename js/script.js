@@ -201,7 +201,7 @@ function reproducirMusica() {
   gainNode.connect(audioContext.destination);
   musicaSource.start();
   musicaReproduciendose = true;
-  
+
   // Manejar cuando la fuente se detiene
   musicaSource.onended = () => {
     musicaReproduciendose = false;
@@ -252,7 +252,7 @@ async function grabarVoz() {
       stream.getTracks().forEach(track => track.stop());
       grabacionBlob = new Blob(chunks, { type: 'audio/webm' });
       grabacionURL = URL.createObjectURL(grabacionBlob);
-      
+
       // Mostrar controles de preview
       document.getElementById('start').style.display = 'none';
       document.getElementById('controles-grabacion').style.display = 'flex';
@@ -270,7 +270,7 @@ async function grabarVoz() {
 // Procesa la grabación de audio para extraer características y generar el dibujo
 async function procesarGrabacion() {
   if (!grabacionBlob) return;
-  
+
   try {
     const arrayBuffer = await grabacionBlob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -304,8 +304,8 @@ async function procesarGrabacion() {
 function detectarTono(audioData, sampleRate) {
   let cruces = 0;
   for (let i = 1; i < audioData.length; i++) {
-    if ((audioData[i-1] >= 0 && audioData[i] < 0) || 
-        (audioData[i-1] < 0 && audioData[i] >= 0)) {
+    if ((audioData[i - 1] >= 0 && audioData[i] < 0) ||
+      (audioData[i - 1] < 0 && audioData[i] >= 0)) {
       cruces++;
     }
   }
@@ -319,12 +319,12 @@ function tonoAColor(frecuencia) {
   // Rango típico voz humana: 85Hz (bajo) a 255Hz (alto)
   // Mapear a escala de color: rojo(0) -> naranja -> amarillo -> verde -> cyan -> azul -> violeta(300)
   const hue = map(frecuencia, 85, 255, 0, 300, true);
-  
+
   // Convertir HSL a RGB
   const h = hue / 360;
   const s = 0.9;
   const l = 0.6;
-  
+
   let r, g, b;
   if (s === 0) {
     r = g = b = l;
@@ -332,18 +332,18 @@ function tonoAColor(frecuencia) {
     const hue2rgb = (p, q, t) => {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
       return p;
     };
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     const p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1/3);
+    r = hue2rgb(p, q, h + 1 / 3);
     g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
+    b = hue2rgb(p, q, h - 1 / 3);
   }
-  
+
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
@@ -351,8 +351,8 @@ function tonoAColor(frecuencia) {
 function map(value, start1, stop1, start2, stop2, withinBounds) {
   const mapped = start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
   if (!withinBounds) return mapped;
-  return start2 < stop2 ? 
-    Math.max(Math.min(mapped, stop2), start2) : 
+  return start2 < stop2 ?
+    Math.max(Math.min(mapped, stop2), start2) :
     Math.max(Math.min(mapped, start2), stop2);
 }
 
@@ -366,7 +366,7 @@ function setup() {
   pg = createGraphics(size, size);
   const canvas = createCanvas(size, size);
   canvas.parent('zona-dibujo');
-  
+
   // Inicializar partículas
   for (let i = 0; i < 50; i++) {
     particulas.push(new Particula());
@@ -378,7 +378,7 @@ class Particula {
   constructor() {
     this.reiniciar();
   }
-  
+
   // Reinicia la partícula con posición y velocidad aleatorias
   reiniciar() {
     const angulo = random(TWO_PI);
@@ -391,18 +391,18 @@ class Particula {
     this.alpha = random(100, 200);
     this.vida = 255;
   }
-  
+
   // Actualiza posición y vida de la partícula
   actualizar() {
     this.x += this.vx;
     this.y += this.vy;
     this.vida -= 2;
-    
+
     if (this.vida <= 0) {
       this.reiniciar();
     }
   }
-  
+
   // Dibuja la partícula en el canvas
   mostrar() {
     push();
@@ -513,7 +513,7 @@ function draw() {
   // Aplicar máscara circular antes de dibujar
   clear();
   background(10, 10, 26);
-  
+
   // Dibujar partículas si estamos dibujando
   if (estado === 'dibujando') {
     for (let p of particulas) {
@@ -521,15 +521,15 @@ function draw() {
       p.mostrar();
     }
   }
-  
+
   // Crear máscara circular y aplicarla
   push();
-  translate(width/2, height/2);
-  
+  translate(width / 2, height / 2);
+
   // Dibujar la imagen dentro del círculo usando clip
   drawingContext.save();
   drawingContext.beginPath();
-  drawingContext.arc(0, 0, width/2, 0, Math.PI * 2);
+  drawingContext.arc(0, 0, width / 2, 0, Math.PI * 2);
   drawingContext.clip();
   imageMode(CENTER);
   image(pg, 0, 0);
@@ -542,25 +542,25 @@ function draw() {
     if (progresosCristales >= 1) {
       cristalizando = false;
     }
-    
+
     // Dibujar cristales tipo Voronoi
     push();
-    translate(width/2, height/2);
+    translate(width / 2, height / 2);
     stroke(255, 255, 255, (1 - progresosCristales) * 200);
     strokeWeight(2);
     noFill();
-    
+
     for (let i = 0; i < 30; i++) {
       const ang = (i / 30) * TWO_PI;
-      const r1 = width/2 * progresosCristales * 0.3;
-      const r2 = width/2 * progresosCristales * 0.6;
+      const r1 = width / 2 * progresosCristales * 0.3;
+      const r2 = width / 2 * progresosCristales * 0.6;
       const x1 = cos(ang) * r1;
       const y1 = sin(ang) * r1;
       const x2 = cos(ang) * r2;
       const y2 = sin(ang) * r2;
       line(x1, y1, x2, y2);
     }
-    
+
     // Flash blanco
     if (progresosCristales < 0.3) {
       fill(255, 255, 255, (0.3 - progresosCristales) * 400);
@@ -599,7 +599,7 @@ document.getElementById('btn-comenzar').onclick = async () => {
   if (audioContext.state === 'suspended') {
     await audioContext.resume();
   }
-  
+
   document.getElementById('intro').style.display = 'none';
   document.getElementById('main').style.display = 'flex';
   estado = 'inicio';
@@ -633,11 +633,32 @@ document.getElementById('btn-mensaje').onclick = () => {
 document.getElementById('btn-ver-carta').onclick = () => {
   generarCarta();
   document.getElementById('carta-modal').classList.add('active');
+  // Push state to history to handle back button
+  history.pushState({ modal: 'carta' }, 'Carta', '#carta');
+};
+
+// Handle back button (popstate)
+window.onpopstate = (event) => {
+  const cartaModal = document.getElementById('carta-modal');
+  if (cartaModal.classList.contains('active')) {
+    // If user presses back while modal is open
+    const confirmacion = confirm("¿Quieres cerrar la carta y volver? / Do you want to close the card?");
+    if (confirmacion) {
+      cartaModal.classList.remove('active');
+    } else {
+      // If user cancels, push state again to stay on "page"
+      history.pushState({ modal: 'carta' }, 'Carta', '#carta');
+    }
+  }
 };
 
 // Oculta el modal de la carta
 document.getElementById('btn-cerrar-carta').onclick = () => {
   document.getElementById('carta-modal').classList.remove('active');
+  // Go back in history if we pushed state, to keep history clean
+  if (history.state && history.state.modal === 'carta') {
+    history.back();
+  }
 };
 
 // Descarga la carta como imagen PNG
@@ -652,11 +673,11 @@ function generarCarta() {
   cartaCanvas.width = 280;
   cartaCanvas.height = 280;
   const ctx = cartaCanvas.getContext('2d');
-  
+
   // Dibujar fondo
   ctx.fillStyle = '#0a0a1a';
   ctx.fillRect(0, 0, 280, 280);
-  
+
   // Dibujar el círculo con la imagen
   ctx.save();
   ctx.beginPath();
@@ -664,25 +685,25 @@ function generarCarta() {
   ctx.clip();
   ctx.drawImage(pg.canvas, 0, 0, pg.width, pg.height, 0, 0, 280, 280);
   ctx.restore();
-  
+
   // Borde del círculo
   ctx.strokeStyle = '#d4af37';
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.arc(140, 140, 140, 0, Math.PI * 2);
   ctx.stroke();
-  
+
   // Actualizar mensaje y fecha
   document.getElementById('carta-mensaje').textContent = mensajeActual;
   const ahora = new Date();
-  const fecha = ahora.toLocaleDateString('es-AR', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const fecha = ahora.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
-  const hora = ahora.toLocaleTimeString('es-AR', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  const hora = ahora.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit'
   });
   document.getElementById('carta-fecha').textContent = `${fecha} • ${hora}`;
 }
@@ -694,25 +715,25 @@ function descargarCarta() {
   tempCanvas.width = 400;
   tempCanvas.height = 600;
   const ctx = tempCanvas.getContext('2d');
-  
+
   // Fondo degradado
   const gradient = ctx.createLinearGradient(0, 0, 400, 600);
   gradient.addColorStop(0, '#1a1a2e');
   gradient.addColorStop(1, '#16213e');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 400, 600);
-  
+
   // Borde dorado
   ctx.strokeStyle = '#d4af37';
   ctx.lineWidth = 6;
   ctx.strokeRect(3, 3, 394, 594);
-  
+
   // Título
   ctx.fillStyle = '#d4af37';
   ctx.font = 'bold 32px Cinzel, serif';
   ctx.textAlign = 'center';
   ctx.fillText('FONOTIPIA', 200, 60);
-  
+
   // Línea debajo del título
   ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
   ctx.lineWidth = 2;
@@ -720,11 +741,11 @@ function descargarCarta() {
   ctx.moveTo(60, 80);
   ctx.lineTo(340, 80);
   ctx.stroke();
-  
+
   // Imagen circular
   const cartaCanvas = document.getElementById('carta-imagen');
   ctx.drawImage(cartaCanvas, 60, 110);
-  
+
   // Mensaje
   ctx.fillStyle = '#e0e0e0';
   ctx.font = 'italic 16px Spectral, serif';
@@ -733,7 +754,7 @@ function descargarCarta() {
   let linea = '';
   let y = 440;
   const maxWidth = 320;
-  
+
   for (let palabra of palabras) {
     const testLinea = linea + palabra + ' ';
     const metrics = ctx.measureText(testLinea);
@@ -746,18 +767,18 @@ function descargarCarta() {
     }
   }
   ctx.fillText(linea, 200, y);
-  
+
   // Fecha
   const fechaTexto = document.getElementById('carta-fecha').textContent;
   ctx.fillStyle = '#a0a0a0';
   ctx.font = '14px Spectral, serif';
   ctx.fillText(fechaTexto, 200, 560);
-  
+
   // Firma del desarrollador
   ctx.fillStyle = '#707070';
   ctx.font = 'italic 11px Spectral, serif';
   ctx.fillText('Carlos Guariglia © 2025', 200, 585);
-  
+
   // Ornamentos en las esquinas
   ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
   ctx.lineWidth = 2;
@@ -785,7 +806,7 @@ function descargarCarta() {
   ctx.lineTo(380, 580);
   ctx.lineTo(380, 540);
   ctx.stroke();
-  
+
   // Descargar
   tempCanvas.toBlob((blob) => {
     const url = URL.createObjectURL(blob);
@@ -802,7 +823,7 @@ document.getElementById('btn-volver').onclick = () => {
   // Volver a la pantalla de intro
   document.getElementById('main').style.display = 'none';
   document.getElementById('intro').style.display = 'flex';
-  
+
   // Resetear estado
   estado = 'inicio';
   semilla = null;
@@ -815,7 +836,7 @@ document.getElementById('btn-volver').onclick = () => {
   document.getElementById('btn-volver').style.display = 'none';
   document.getElementById('mensaje').style.opacity = '0';
   document.getElementById('mensaje').textContent = '';
-  
+
   // Limpiar canvas
   clear();
   pg.clear();
@@ -855,15 +876,15 @@ async function subirImagenAImgbb(blob) {
   const formData = new FormData();
   formData.append('image', blob);
   formData.append('key', '246ea11e41f960e348520c7414ea225d'); // Tu API key de imgbb
-  
+
   try {
     const response = await fetch('https://api.imgbb.com/1/upload', {
       method: 'POST',
       body: formData
     });
-    
+
     if (!response.ok) throw new Error('Error al subir imagen');
-    
+
     const data = await response.json();
     return data.data.url; // URL de la imagen subida
   } catch (error) {
@@ -880,25 +901,25 @@ document.getElementById('btn-enviar-email').onclick = async () => {
   tempCanvas.width = 400;
   tempCanvas.height = 600;
   const ctx = tempCanvas.getContext('2d');
-  
+
   // Fondo degradado
   const gradient = ctx.createLinearGradient(0, 0, 400, 600);
   gradient.addColorStop(0, '#1a1a2e');
   gradient.addColorStop(1, '#16213e');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 400, 600);
-  
+
   // Borde dorado
   ctx.strokeStyle = '#d4af37';
   ctx.lineWidth = 6;
   ctx.strokeRect(3, 3, 394, 594);
-  
+
   // Título
   ctx.fillStyle = '#d4af37';
   ctx.font = 'bold 32px Cinzel, serif';
   ctx.textAlign = 'center';
   ctx.fillText('FONOTIPIA', 200, 60);
-  
+
   // Línea debajo del título
   ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
   ctx.lineWidth = 2;
@@ -906,11 +927,11 @@ document.getElementById('btn-enviar-email').onclick = async () => {
   ctx.moveTo(60, 80);
   ctx.lineTo(340, 80);
   ctx.stroke();
-  
+
   // Imagen circular
   const cartaCanvas = document.getElementById('carta-imagen');
   ctx.drawImage(cartaCanvas, 60, 110);
-  
+
   // Mensaje
   ctx.fillStyle = '#e0e0e0';
   ctx.font = 'italic 16px Spectral, serif';
@@ -919,7 +940,7 @@ document.getElementById('btn-enviar-email').onclick = async () => {
   let linea = '';
   let y = 440;
   const maxWidth = 320;
-  
+
   for (let palabra of palabras) {
     const testLinea = linea + palabra + ' ';
     const metrics = ctx.measureText(testLinea);
@@ -932,18 +953,18 @@ document.getElementById('btn-enviar-email').onclick = async () => {
     }
   }
   ctx.fillText(linea, 200, y);
-  
+
   // Fecha
   const fechaTexto = document.getElementById('carta-fecha').textContent;
   ctx.fillStyle = '#a0a0a0';
   ctx.font = '14px Spectral, serif';
   ctx.fillText(fechaTexto, 200, 560);
-  
+
   // Firma del desarrollador
   ctx.fillStyle = '#707070';
   ctx.font = 'italic 11px Spectral, serif';
   ctx.fillText('Carlos Guariglia © 2025', 200, 585);
-  
+
   // Ornamentos en las esquinas
   ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
   ctx.lineWidth = 2;
@@ -971,7 +992,7 @@ document.getElementById('btn-enviar-email').onclick = async () => {
   ctx.lineTo(380, 580);
   ctx.lineTo(380, 540);
   ctx.stroke();
-  
+
   // Convertir a blob y subir
   tempCanvas.toBlob(async (blob) => {
     const imageUrl = await subirImagenAImgbb(blob);
