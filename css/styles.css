@@ -230,3 +230,59 @@ button:hover {
   font-style: italic;
   pointer-events: none;
 }
+
+.historia-content {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: left;
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  #intro p {
+    font-size: 1.2rem;
+    padding: 0 1rem;
+  }
+
+  #carta-contenedor {
+    width: 90%;
+    max-width: 350px;
+    height: auto;
+    min-height: 500px;
+    padding: 1.5rem;
+  }
+
+  #carta-imagen {
+    width: 200px;
+    height: 200px;
+  }
+
+  #carta-titulo {
+    font-size: 1.5rem;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    margin: 0.2rem;
+  }
+  
+  #controles-grabacion {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #historia-modal, #carta-modal {
+    padding: 1rem;
+  }
+  
+  .historia-content {
+    font-size: 1rem;
+  }
+}
